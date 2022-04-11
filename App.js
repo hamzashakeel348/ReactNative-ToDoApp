@@ -6,106 +6,117 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import type {Node} from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
-} from 'react-native';
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import KeyboardAvoidingView from "react-native/Libraries/Components/Keyboard/KeyboardAvoidingView";
+import Task from "./Components/Task";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App = () => {
+  const [task, setTask] = useState();
+  const [list, setList] = useState([]);
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
+  const handleAddTask = () => {
+    setList([...list, task]);
+    setTask(null);
+  };
+
+  const deleteTask = (index) => {
+    let templist = [...list];
+    templist.splice(index, 1);
+    setList(templist);
+  };
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.heading}>TODO-App</Text>
+      <View style={styles.tasksWrapper}>
+        <Text style={styles.sectionTitle}>Pending Tasks</Text>
+        <View style={styles.items}>
+          {list.length > 0 ? (
+            list.map((task, idx) => {
+              return (
+                <TouchableOpacity key={idx} onPress={() => deleteTask(idx)}>
+                  <Task key={idx} text={task} />
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <Text>No Tasks Pending</Text>
+          )}
+        </View>
+      </View>
+      <KeyboardAvoidingView behavior="height" style={styles.wrteTaskWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder={"Write Here"}
+          value={task}
+          onChangeText={(text) => setTask(text)}
+        />
+        <TouchableOpacity onPressIn={() => handleAddTask()}>
+          <View style={styles.addWrapper}>
+            <Text style={styles.addText}>+</Text>
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </View>
   );
 };
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
-
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    backgroundColor: "#E8EAED",
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "center",
+    padding: 10,
+    backgroundColor: "#000000",
+    color: "#fff",
+    fontFamily: "arial",
+  },
+  tasksWrapper: {
+    paddingTop: 80,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "bold",
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  items: { marginTop: 30 },
+  wrteTaskWrapper: {
+    position: "absolute",
+    bottom: 60,
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
-  highlight: {
-    fontWeight: '700',
+  input: {
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    backgroundColor: "#fff",
+    borderRadius: 60,
+    borderWidth: 1,
+    borderColor: "#C0C0C0",
+    width: 250,
+  },
+  addWrapper: {
+    width: 60,
+    height: 60,
+    backgroundColor: "#FFF",
+    borderRadius: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#C0C0C0",
+    borderWidth: 1,
   },
 });
 
